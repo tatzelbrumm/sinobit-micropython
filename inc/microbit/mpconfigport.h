@@ -136,7 +136,7 @@ extern const struct _mp_obj_module_t speech_module;
 #include <alloca.h>
 
 #define MICROPY_HAL_H "mphal.h"
-#define MICROPY_HW_BOARD_NAME "micro:bit"
+#define MICROPY_HW_BOARD_NAME "sino:bit"
 #define MICROPY_HW_MCU_NAME "nRF51822"
 
 // Toolchain seems to be missing M_PI
@@ -146,4 +146,3 @@ extern const struct _mp_obj_module_t speech_module;
 
 // The ticker callback function
 extern void microbit_ticker(void);
-

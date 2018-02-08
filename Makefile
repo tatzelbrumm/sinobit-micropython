@@ -3,7 +3,7 @@ PYTHON = python
 
 QSTR_DEFS = inc/py/qstrdefs.h inc/microbit/qstrdefsport.h
 
-OUT_SRC = build/bbc-microbit-classic-gcc-nosd/source/microbit-micropython
+OUT_SRC = build/bbc-microbit-classic-gcc-nosd/source/sinobit-micropython
 HEX_SRC = $(OUT_SRC).hex
 HEX_FINAL = build/firmware.hex
 
@@ -18,7 +18,7 @@ yotta: inc/genhdr/qstrdefs.generated.h
 # the lines in "" and then unwrap after the preprocessor is finished.
 inc/genhdr/qstrdefs.generated.h: $(QSTR_DEFS) tools/makeqstrdata.py inc/microbit/mpconfigport.h inc/py/mpconfig.h
 	$(ECHO) "Generating $@"
-	@cat $(QSTR_DEFS) | sed 's/^Q(.*)/"&"/' | $(CPP) -Iinc -Iinc/microbit - | sed 's/^"\(Q(.*)\)"/\1/' > build/qstrdefs.preprocessed.h
+	@cat $(QSTR_DEFS) | sed 's/^Q(.*)/"&"/' | $(CPP) -E -Iinc -Iinc/microbit - | sed 's/^"\(Q(.*)\)"/\1/' > build/qstrdefs.preprocessed.h
 	@$(PYTHON) tools/makeqstrdata.py build/qstrdefs.preprocessed.h > $@
 
 deploy: $(HEX_FINAL)
