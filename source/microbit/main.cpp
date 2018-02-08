@@ -9,7 +9,7 @@ extern "C" {
 #include "lib/pwm.h"
 
     void mp_run(void);
-    
+
     void microbit_button_init(void);
     void microbit_accelerometer_init(void);
     void microbit_button_tick(void);
@@ -18,7 +18,7 @@ extern "C" {
 }
 
 void app_main() {
-    
+
     // debugging: print memory layout
     /*
     extern uint32_t __data_start__, __data_end__;
@@ -35,7 +35,7 @@ void app_main() {
 
     currentFiber->flags |= MICROBIT_FIBER_FLAG_DO_NOT_PAGE;
 
-    
+
     microbit_button_init();
     microbit_accelerometer_init();
 
@@ -55,7 +55,7 @@ void microbit_ticker(void) {
     microbit_button_tick();
 
     // Update the display.
-    microbit_display_tick();
+    //microbit_display_tick();
 
     // Update the music
     microbit_music_tick();
@@ -74,7 +74,7 @@ void __register_exitproc() {
 
 void microbit_init(void) {
     uBit.display.disable();
-    microbit_display_init();
+    //microbit_display_init();
     microbit_filesystem_init();
     microbit_pin_init();
     pwm_init();
