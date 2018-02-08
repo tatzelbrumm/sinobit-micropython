@@ -1,5 +1,9 @@
 // qstrs specific to this port
 
+// sinobit-specific qstrs below:
+Q(sinobit)
+
+// microbit inherited qstrs:
 Q(help)
 Q(input)
 Q(collections)
