@@ -23,22 +23,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-extern "C" {
+#ifndef __MICROPY_INCLUDED_SIMOBIT_MODSINOBIT_H__
+#define __MICROPY_INCLUDED_SIMOBIT_MODSINOBIT_H__
 
-#include "py/obj.h"
-#include "modsinobit.h"
+extern const mp_obj_module_t sinobitdisplay_module;
 
-STATIC const mp_map_elem_t sinobit_module_globals_table[] = {
-    { MP_OBJ_NEW_QSTR(MP_QSTR___name__), MP_OBJ_NEW_QSTR(MP_QSTR_sinobit) },
-    { MP_OBJ_NEW_QSTR(MP_QSTR_display), (mp_obj_t)&sinobitdisplay_module },
-};
-
-STATIC MP_DEFINE_CONST_DICT(sinobit_module_globals, sinobit_module_globals_table);
-
-const mp_obj_module_t sinobit_module = {
-    .base = { &mp_type_module },
-    .name = MP_QSTR_sinobit,
-    .globals = (mp_obj_dict_t*)&sinobit_module_globals,
-};
-
-}
+#endif

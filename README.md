@@ -13,7 +13,7 @@ hardware of the sino:bit.  You can control the sino:bit hardware from
 Python code!
 
 Note this project is not related to the BBC micro:bit MicroPython port
-(beyond being the starting point for the code of this port). Questions, 
+(beyond being the starting point for the code of this port). Questions,
 issues, or support for this port should not be directed at the micro:bit
 community.
 
@@ -27,7 +27,9 @@ Differences with the BBC micro:bit
     by the GPIO pins of the processor.  As a result the sino:bit has the
     potential to display much more information than the micro:bit, and
     the dedicated LED driver relieves some of the processing burden of
-    driving the display from the CPU.
+    driving the display from the CPU.  However note the HT1632C does not
+    support driving the brightness level of individual LEDs and instead can
+    only brighten or dim the entire display.
 
 -   The sino:bit includes grove-style connectors to break out I2C and
     serial UART connections with other sensors.  In addition an unpopulated

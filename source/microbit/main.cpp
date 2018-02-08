@@ -1,6 +1,6 @@
 #include "MicroBit.h"
 #include "microbitobj.h"
-#include "microbitdisplay.h"
+#include "sinobitdisplay.h"
 #include "microbitmusic.h"
 
 extern "C" {
@@ -75,6 +75,7 @@ void __register_exitproc() {
 void microbit_init(void) {
     uBit.display.disable();
     //microbit_display_init();
+    sinobit_display_init();
     microbit_filesystem_init();
     microbit_pin_init();
     pwm_init();
