@@ -47,7 +47,35 @@ When they are available pre-built binary firmwares will be published in the
 releases tab of this GitHub repository.  These are the .hex files you want
 to drag onto the sino:bit's MICROBIT drive to load the firmware.
 
+Project Goals
+-------------
 
+_This is currently a brain dump of some ideas, goals, to-dos for this project._
+
+-   Add support for the 12x12 LED matrix to the MicroPython firmware.  Support
+    basic pixel drawing operations (clear, fill, set pixel, draw line, draw
+    circle, etc.).
+-   Add support for Chinese text rendering on the matrix.  There is a lot of
+    work to investigate here, particularly with text encodings, character sets,
+    character representations and rendering.
+-   Backwards compatibility with the micro:bit 5x5 LED display.  In theory it's
+    possible to upsample drawing commands intended for the micro:bit's 5x5
+    display to instead target 2x2 pixel chunks on the 12x12 display (with an
+    unused single pixel frame around the edge).  This would make it possible for
+    existing micro:bit MicroPython code to 'just work' on the sino:bit and display
+    with large pixels.
+-   Investigate untangling and removing hardware access layer dependencies.  It
+    appears there are 3 hardware access layers being used: Nordic's nRF layer,
+    mBed's classic layer, and a Lancaster University micro:bit device access layer.
+    As the sino:bit no longer needs complex 5x5 LED matrix driving it is unclear
+    the need for some of these layers like the Lancaster University DAL.  Perhaps
+    dropping down to a basic usage of Nordic or mBed's hardware access layer would
+    save flash space.  Support for the board peripherals like accelerometer and
+    magnetomer could be added as simple C extensions.
+-   Work on renaming from micro:bit to sino:bit internally.  The microbit module
+    should ideally be retained for compatibility with existing micro:bit MicroPython
+    code.  However much of the project structure, code files, etc. currently still
+    use the micro:bit nomenclature.
 
 More sino:bit Information
 -------------------------
