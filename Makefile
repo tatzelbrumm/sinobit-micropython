@@ -3,7 +3,8 @@ PYTHON = python
 
 QSTR_DEFS = inc/py/qstrdefs.h inc/microbit/qstrdefsport.h
 
-HEX_SRC = build/bbc-microbit-classic-gcc-nosd/source/microbit-micropython.hex
+OUT_SRC = build/bbc-microbit-classic-gcc-nosd/source/microbit-micropython
+HEX_SRC = $(OUT_SRC).hex
 HEX_FINAL = build/firmware.hex
 
 all: yotta
@@ -11,6 +12,7 @@ all: yotta
 yotta: inc/genhdr/qstrdefs.generated.h
 	@yt build
 	@/bin/cp $(HEX_SRC) $(HEX_FINAL)
+	@arm-none-eabi-size $(OUT_SRC)
 
 # Note: we need to protect the qstr names from the preprocessor, so we wrap
 # the lines in "" and then unwrap after the preprocessor is finished.
