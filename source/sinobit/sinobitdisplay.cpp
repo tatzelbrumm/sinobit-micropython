@@ -138,7 +138,7 @@ void framebuffer_set(uint8_t x, uint8_t y, bool value) {
     // Invert position within each 4 bit nibble to match order of bits for
     // HT1632 display memory.
     if (byte_offset < 4) {
-        // 1 2 3 4 -> 4 3 2 1
+        // 0 1 2 3 -> 3 2 1 0
         byte_offset = 3 - byte_offset;
     }
     else {
@@ -152,6 +152,31 @@ void framebuffer_set(uint8_t x, uint8_t y, bool value) {
     else {
         framebuffer[byte_pos] &= ~(1 << byte_offset);
     }
+}
+
+// Get the value of the pixel at the provided x, y position.
+// Returns true if set and false if not set (or an invalid position).
+bool framebuffer_get(uint8_t x, uint8_t y) {
+    // Ignore values that are out of bounds of the 12x12 portion of display.
+    if ((x > 11) || (y > 11)) {
+      return false;
+    }
+    // Calculate bit position of this pixel within framebuffer.
+    uint8_t bit = y*16+x;
+    uint8_t byte_pos = bit / 8;
+    uint8_t byte_offset = bit % 8;
+    // Invert position within each 4 bit nibble to match order of bits for
+    // HT1632 display memory.
+    if (byte_offset < 4) {
+        // 0 1 2 3 -> 3 2 1 0
+        byte_offset = 3 - byte_offset;
+    }
+    else {
+        // 4 5 6 7 -> 7 6 5 4
+        byte_offset = 11 - byte_offset;
+    }
+    // Check if the bit at the pixel position is set.
+    return (framebuffer[byte_pos] & (1 << byte_offset)) > 0;
 }
 
 // Write out the framebuffer data to the display.
@@ -223,6 +248,16 @@ STATIC mp_obj_t sinobit_display_set_pixel(mp_obj_t x, mp_obj_t y, mp_obj_t c) {
 }
 MP_DEFINE_CONST_FUN_OBJ_3(sinobitdisplay_set_pixel_obj, sinobit_display_set_pixel);
 
+STATIC mp_obj_t sinobit_display_get_pixel(mp_obj_t x, mp_obj_t y) {
+    if (framebuffer_get(mp_obj_get_int(x), mp_obj_get_int(y))) {
+        return mp_const_true;
+    }
+    else {
+        return mp_const_false;
+    }
+}
+MP_DEFINE_CONST_FUN_OBJ_2(sinobitdisplay_get_pixel_obj, sinobit_display_get_pixel);
+
 STATIC mp_obj_t sinobit_display_write() {
     framebuffer_write();
     return mp_const_none;
@@ -242,14 +277,15 @@ STATIC mp_obj_t sinobit_display_clear() {
 MP_DEFINE_CONST_FUN_OBJ_0(sinobitdisplay_clear_obj, sinobit_display_clear);
 
 STATIC mp_obj_t sinobit_display_brightness(mp_obj_t brightness) {
-  ht1632_brightness(mp_obj_get_int(brightness));
-  return mp_const_none;
+    ht1632_brightness(mp_obj_get_int(brightness));
+    return mp_const_none;
 }
 MP_DEFINE_CONST_FUN_OBJ_1(sinobitdisplay_brightness_obj, sinobit_display_brightness);
 
 STATIC const mp_map_elem_t sinobitdisplay_module_globals_table[] = {
     { MP_OBJ_NEW_QSTR(MP_QSTR___name__), MP_OBJ_NEW_QSTR(MP_QSTR_display) },
     { MP_OBJ_NEW_QSTR(MP_QSTR_set_pixel), (mp_obj_t)&sinobitdisplay_set_pixel_obj },
+    { MP_OBJ_NEW_QSTR(MP_QSTR_get_pixel), (mp_obj_t)&sinobitdisplay_get_pixel_obj },
     { MP_OBJ_NEW_QSTR(MP_QSTR_write), (mp_obj_t)&sinobitdisplay_write_obj },
     { MP_OBJ_NEW_QSTR(MP_QSTR_fill), (mp_obj_t)&sinobitdisplay_fill_obj },
     { MP_OBJ_NEW_QSTR(MP_QSTR_clear), (mp_obj_t)&sinobitdisplay_clear_obj },

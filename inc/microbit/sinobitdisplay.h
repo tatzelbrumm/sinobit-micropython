@@ -30,6 +30,8 @@ extern "C" {
 
     void framebuffer_set(uint8_t x, uint8_t y, bool value);
 
+    bool framebuffer_get(uint8_t x, uint8_t y);
+
     void framebuffer_write();
 
     void framebuffer_fill(bool value);

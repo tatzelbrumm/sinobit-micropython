@@ -5,4 +5,5 @@ yotta_targets/*
 *.swp
 __pycache__
 *.gch
+.DS_Store
 
