@@ -54,9 +54,6 @@ void microbit_ticker(void) {
     // Update buttons and pins with touch.
     microbit_button_tick();
 
-    // Update the display.
-    //microbit_display_tick();
-
     // Update the music
     microbit_music_tick();
 
@@ -74,7 +71,6 @@ void __register_exitproc() {
 
 void microbit_init(void) {
     uBit.display.disable();
-    //microbit_display_init();
     sinobit_display_init();
     microbit_filesystem_init();
     microbit_pin_init();
