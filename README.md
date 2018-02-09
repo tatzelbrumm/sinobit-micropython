@@ -78,6 +78,13 @@ _This is currently a brain dump of some ideas, goals, to-dos for this project._
     should ideally be retained for compatibility with existing micro:bit MicroPython
     code.  However much of the project structure, code files, etc. currently still
     use the micro:bit nomenclature.
+-   Port the BBC micro:bit web editor to support the sino:bit.  This editor works by
+    appending a MicroPython script to a certain location in the MicroPython firmware
+    hex file (thus it's easy for an entirely web-based/JavaScript app to 'compile'
+    code for the board).  It should just be a matter of taking the web editor code
+    and changing the hex file it uses to point at the sino:bit version here, along
+    with minor tweaks to the UI language, etc.  Ideally this could just be hosted
+    straight from this GitHub repository using GitHub's jekyll-based pages rendering.
 
 More sino:bit Information
 -------------------------
