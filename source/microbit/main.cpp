@@ -1,5 +1,6 @@
 #include "MicroBit.h"
 #include "microbitobj.h"
+#include "microbitdisplay.h"
 #include "sinobitdisplay.h"
 #include "microbitmusic.h"
 
@@ -53,6 +54,9 @@ void microbit_ticker(void) {
 
     // Update buttons and pins with touch.
     microbit_button_tick();
+
+    // Update microbit API display animations.
+    microbit_display_tick();
 
     // Update the music
     microbit_music_tick();

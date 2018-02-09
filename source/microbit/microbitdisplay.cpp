@@ -37,8 +37,52 @@ extern "C" {
 #include "microbitpin.h"
 #include "lib/iters.h"
 #include "lib/ticker.h"
+#include "sinobitdisplay.h"
 
 #define min(a,b) (((a)<(b))?(a):(b))
+
+// New implementation of image buffer pixel drawing that maps the 5x5 pixels
+// of the micro:bit to the 12x12 display of the sino:bit.  This conversion is
+// done by upsampling to 2x2 pixel blocks on the sino:bit display, framed by
+// a 1 pixel wide unused frame around the pixels.  Any brightness values are
+// ignored since the sinobit display can't set individual pixel brightness.
+static void mock_image_buffer_set_pixel(uint8_t x, uint8_t y, uint8_t c) {
+    // Calculate location within the 12x12 of the sinobit display.
+    // Note that we need to invert the x axis.
+    uint8_t sinobit_x = 10-(1+2*x);
+    uint8_t sinobit_y = 1+2*y;
+    // Turn any non-zero brightness to an on pixel.
+    bool sinobit_c = c > 0 ? true : false;
+    // Set the four pixels of this 2x2 chunk.
+    framebuffer_set(sinobit_x,   sinobit_y,   sinobit_c);
+    framebuffer_set(sinobit_x+1, sinobit_y,   sinobit_c);
+    framebuffer_set(sinobit_x,   sinobit_y+1, sinobit_c);
+    framebuffer_set(sinobit_x+1, sinobit_y+1, sinobit_c);
+    // Immediately write to the display.  This would normally happen in the
+    // tick callback a short while later, but writing now should work.
+    framebuffer_write();
+}
+
+static uint8_t mock_image_buffer_get_pixel(uint8_t x, uint8_t y) {
+    // Calculate location within the 12x12 of the sinobit display.
+    uint8_t sinobit_x = 10-(1+2*x);
+    uint8_t sinobit_y = 1+2*y;
+    // Check if all 4 pixels of this 2x2 are set.  This isn't perfect since
+    // the user might use the sinobit module to manipulate individual pixels.
+    // Perhaps consider keeping track of display buffer state separately.
+    if (framebuffer_get(sinobit_x,   sinobit_y)   &&
+        framebuffer_get(sinobit_x+1, sinobit_y)   &&
+        framebuffer_get(sinobit_x,   sinobit_y+1) &&
+        framebuffer_get(sinobit_x+1, sinobit_y+1)) {
+        // Pixel is set, return max brightness.  Note this will lose brightness
+        // information which might break certain code that depends on it!
+        // Again perhaps store this separately for compatibility.
+        return 9; // Max brightness (9)
+    }
+    else {
+        return 0; // Off
+    }
+}
 
 void microbit_display_show(microbit_display_obj_t *display, microbit_image_obj_t *image) {
     mp_int_t w = min(image->width(), 5);
@@ -49,19 +93,18 @@ void microbit_display_show(microbit_display_obj_t *display, microbit_image_obj_t
         mp_int_t y = 0;
         for (; y < h; ++y) {
             uint8_t pix = image->getPixelValue(x, y);
-            display->image_buffer[x][y] = pix;
+            mock_image_buffer_set_pixel(x, y, pix);
             brightnesses |= (1 << pix);
         }
         for (; y < 5; ++y) {
-            display->image_buffer[x][y] = 0;
+            mock_image_buffer_set_pixel(x, y, 0);
         }
     }
     for (; x < 5; ++x) {
         for (mp_int_t y = 0; y < 5; ++y) {
-            display->image_buffer[x][y] = 0;
+            mock_image_buffer_set_pixel(x, y, 0);
         }
     }
-    display->brightnesses = brightnesses;
 }
 
 #define DEFAULT_PRINT_SPEED 400
@@ -162,132 +205,6 @@ STATIC void wait_for_event() {
     wakeup_event = false;
 }
 
-struct DisplayPoint {
-    uint8_t x;
-    uint8_t y;
-};
-
-#define NO_CONN 0
-
-#define ROW_COUNT 3
-#define COLUMN_COUNT 9
-
-static const DisplayPoint display_map[COLUMN_COUNT][ROW_COUNT] = {
-    {{0,0}, {4,2}, {2,4}},
-    {{2,0}, {0,2}, {4,4}},
-    {{4,0}, {2,2}, {0,4}},
-    {{4,3}, {1,0}, {0,1}},
-    {{3,3}, {3,0}, {1,1}},
-    {{2,3}, {3,4}, {2,1}},
-    {{1,3}, {1,4}, {3,1}},
-    {{0,3}, {NO_CONN,NO_CONN}, {4,1}},
-    {{1,2}, {NO_CONN,NO_CONN}, {3,2}}
-};
-
-#define MIN_COLUMN_PIN 4
-#define COLUMN_PINS_MASK 0x1ff0
-#define MIN_ROW_PIN 13
-#define MAX_ROW_PIN 15
-#define ROW_PINS_MASK 0xe000
-
-inline void microbit_display_obj_t::setPinsForRow(uint8_t brightness) {
-    if (brightness == 0) {
-        nrf_gpio_pins_clear(COLUMN_PINS_MASK & ~this->pins_for_brightness[brightness]);
-    } else {
-        nrf_gpio_pins_set(this->pins_for_brightness[brightness]);
-    }
-}
-
-/* This is the primary PWM driver/display driver.  It will operate on one row
- * (9 pins) per invocation.  It will turn on LEDs with maximum brightness,
- * then let the "callback" callback turn off the LEDs as appropriate for the
- * required brightness level.
- *
- * For each row
- *   Turn off all the LEDs in the previous row
- *     Set the column bits high (off)
- *     Set the row strobe low (off)
- *   Turn on all the LEDs in the current row that have maximum brightness
- *     Set the row strobe high (on)
- *     Set some/all column bits low (on)
- *   Register the PWM callback
- *   For each callback start with brightness 0
- *     If brightness 0
- *       Turn off the LEDs specified at this level
- *     Else
- *       Turn on the LEDs specified at this level
- *     If brightness max
- *       Disable the PWM callback
- *     Else
- *       Re-queue the PWM callback after the appropriate delay
- */
-void microbit_display_obj_t::advanceRow() {
-    /* Clear all of the column bits */
-    nrf_gpio_pins_set(COLUMN_PINS_MASK);
-    /* Clear the strobe bit for this row */
-    nrf_gpio_pin_clear(strobe_row+MIN_ROW_PIN);
-
-    /* Move to the next row.  Before this, "this row" refers to the row
-     * manipulated by the previous invocation of this function.  After this,
-     * "this row" refers to the row manipulated by the current invocation of
-     * this function. */
-    strobe_row++;
-
-    // Reset the row counts and bit mask when we have hit the max.
-    if (strobe_row == ROW_COUNT) {
-        strobe_row = 0;
-    }
-
-    // Set pin for this row.
-    // Prepare row for rendering.
-    for (int i = 0; i <= MAX_BRIGHTNESS; i++) {
-        pins_for_brightness[i] = 0;
-    }
-    for (int i = 0; i < COLUMN_COUNT; i++) {
-        int x = display_map[i][strobe_row].x;
-        int y = display_map[i][strobe_row].y;
-        uint8_t brightness = microbit_display_obj.image_buffer[x][y];
-        pins_for_brightness[brightness] |= (1<<(i+MIN_COLUMN_PIN));
-    }
-    /* Enable the strobe bit for this row */
-    nrf_gpio_pin_set(strobe_row+MIN_ROW_PIN);
-    /* Enable the column bits for all pins that need to be on. */
-    nrf_gpio_pins_clear(pins_for_brightness[MAX_BRIGHTNESS]);
-}
-
-static const uint16_t render_timings[] =
-// The scale is (approximately) exponential,
-// each step is approx x1.9 greater than the previous.
-{   0, // Bright, Ticks Duration, Relative power
-    2,   //   1,   2,     32µs,     inf
-    2,   //   2,   4,     64µs,     200%
-    4,   //   3,   8,     128µs,    200%
-    7,   //   4,   15,    240µs,    187%
-    13,  //   5,   28,    448µs,    187%
-    25,  //   6,   53,    848µs,    189%
-    49,  //   7,   102,   1632µs,   192%
-    97,  //   8,   199,   3184µs,   195%
-// Always on  9,   375,   6000µs,   188%
-};
-
-#define DISPLAY_TICKER_SLOT 1
-
-/* This is the PWM callback.  It is registered by the animation callback and
- * will unregister itself when all of the brightness steps are complete. */
-static int32_t callback(void) {
-    microbit_display_obj_t *display = &microbit_display_obj;
-    mp_uint_t brightness = display->previous_brightness;
-    display->setPinsForRow(brightness);
-    brightness += 1;
-    if (brightness == MAX_BRIGHTNESS) {
-        clear_ticker_callback(DISPLAY_TICKER_SLOT);
-        return -1;
-    }
-    display->previous_brightness = brightness;
-    // Return interval (in 16µs ticks) until next callback
-    return render_timings[brightness];
-}
-
 static void draw_object(mp_obj_t obj) {
     microbit_display_obj_t *display = (microbit_display_obj_t*)MP_STATE_PORT(async_data)[0];
     if (obj == MP_OBJ_STOP_ITERATION) {
@@ -358,23 +275,11 @@ static void microbit_display_update(void) {
     }
 }
 
-#define GREYSCALE_MASK ((1<<MAX_BRIGHTNESS)-2)
-
 /* This is the top-level animation/display callback.  It is not a registered
  * callback. */
 void microbit_display_tick(void) {
-    /* Do nothing if the display is not active. */
-    if (!microbit_display_obj.active) {
-        return;
-    }
-
-    microbit_display_obj.advanceRow();
-
+    // The tick callback now only needs to drive animation updates.
     microbit_display_update();
-    microbit_display_obj.previous_brightness = 0;
-    if (microbit_display_obj.brightnesses & GREYSCALE_MASK) {
-        set_ticker_callback(DISPLAY_TICKER_SLOT, callback, 1800);
-    }
 }
 
 
@@ -428,58 +333,20 @@ mp_obj_t microbit_display_scroll_func(mp_uint_t n_args, const mp_obj_t *pos_args
 MP_DEFINE_CONST_FUN_OBJ_KW(microbit_display_scroll_obj, 1, microbit_display_scroll_func);
 
 mp_obj_t microbit_display_on_func(mp_obj_t obj) {
-    microbit_display_obj_t *self = (microbit_display_obj_t*)obj;
-    /* Try to reclaim the pins we need */
-    microbit_obj_pin_fail_if_cant_acquire(&microbit_p3_obj);
-    microbit_obj_pin_fail_if_cant_acquire(&microbit_p4_obj);
-    microbit_obj_pin_fail_if_cant_acquire(&microbit_p6_obj);
-    microbit_obj_pin_fail_if_cant_acquire(&microbit_p7_obj);
-    microbit_obj_pin_fail_if_cant_acquire(&microbit_p9_obj);
-    microbit_obj_pin_fail_if_cant_acquire(&microbit_p10_obj);
-    microbit_obj_pin_acquire(&microbit_p3_obj, microbit_pin_mode_display);
-    microbit_obj_pin_acquire(&microbit_p4_obj, microbit_pin_mode_display);
-    microbit_obj_pin_acquire(&microbit_p6_obj, microbit_pin_mode_display);
-    microbit_obj_pin_acquire(&microbit_p7_obj, microbit_pin_mode_display);
-    microbit_obj_pin_acquire(&microbit_p9_obj, microbit_pin_mode_display);
-    microbit_obj_pin_acquire(&microbit_p10_obj, microbit_pin_mode_display);
-    /* Make sure all pins are in the correct state */
-    microbit_display_init();
-    /* Re-enable the display loop.  This will resume any animations in
-     * progress and display any static image. */
-    self->active = true;
+    // No-op, the sinobit display has no concept of turning on/off.
     return mp_const_none;
 }
 MP_DEFINE_CONST_FUN_OBJ_1(microbit_display_on_obj, microbit_display_on_func);
 
 mp_obj_t microbit_display_off_func(mp_obj_t obj) {
-    microbit_display_obj_t *self = (microbit_display_obj_t*)obj;
-    /* Disable the display loop.  This will pause any animations in progress.
-     * It will not prevent a user from attempting to modify the state, but
-     * modifications will not appear to have any effect until the display loop
-     * is re-enabled. */
-    self->active = false;
-    /* Disable the row strobes, allowing the columns to be used freely for
-     * GPIO. */
-    nrf_gpio_pins_clear(ROW_PINS_MASK);
-    /* Free pins for other uses */
-    microbit_obj_pin_free(&microbit_p3_obj);
-    microbit_obj_pin_free(&microbit_p4_obj);
-    microbit_obj_pin_free(&microbit_p6_obj);
-    microbit_obj_pin_free(&microbit_p7_obj);
-    microbit_obj_pin_free(&microbit_p9_obj);
-    microbit_obj_pin_free(&microbit_p10_obj);
+    // No-op, the sinobit display has no concept of turning on/off.
     return mp_const_none;
 }
 MP_DEFINE_CONST_FUN_OBJ_1(microbit_display_off_obj, microbit_display_off_func);
 
 mp_obj_t microbit_display_is_on_func(mp_obj_t obj) {
-    microbit_display_obj_t *self = (microbit_display_obj_t*)obj;
-    if (self->active) {
-        return mp_const_true;
-    }
-    else {
-        return mp_const_false;
-    }
+    // No-op, display is always on.
+    return mp_const_true;
 }
 MP_DEFINE_CONST_FUN_OBJ_1(microbit_display_is_on_obj, microbit_display_is_on_func);
 
@@ -504,8 +371,7 @@ void microbit_display_set_pixel(microbit_display_obj_t *display, mp_int_t x, mp_
     if (bright < 0 || bright > MAX_BRIGHTNESS) {
         nlr_raise(mp_obj_new_exception_msg(&mp_type_ValueError, "brightness out of bounds."));
     }
-    display->image_buffer[x][y] = bright;
-    display->brightnesses |= (1 << bright);
+    mock_image_buffer_set_pixel(x, y, bright);
 }
 
 STATIC mp_obj_t microbit_display_set_pixel_func(mp_uint_t n_args, const mp_obj_t *args) {
@@ -520,7 +386,7 @@ mp_int_t microbit_display_get_pixel(microbit_display_obj_t *display, mp_int_t x,
     if (x < 0 || y < 0 || x > 4 || y > 4) {
         nlr_raise(mp_obj_new_exception_msg(&mp_type_ValueError, "index out of bounds."));
     }
-    return display->image_buffer[x][y];
+    return mock_image_buffer_get_pixel(x,y);
 }
 
 STATIC mp_obj_t microbit_display_get_pixel_func(mp_obj_t self_in, mp_obj_t x_in, mp_obj_t y_in) {
@@ -563,17 +429,9 @@ STATIC const mp_obj_type_t microbit_display_type = {
 
 microbit_display_obj_t microbit_display_obj = {
     {&microbit_display_type},
-    { 0 },
-    .previous_brightness = 0,
+    // For some reason the compass depends on display active state.
+    // Need to further investigate this dependency.
     .active = 1,
-    .strobe_row = 0,
-    .brightnesses = 0,
-    .pins_for_brightness = { 0 },
 };
-
-void microbit_display_init(void) {
-    //  Set pins as output.
-    nrf_gpio_range_cfg_output(MIN_COLUMN_PIN, MIN_COLUMN_PIN + COLUMN_COUNT + ROW_COUNT);
-}
 
 }
