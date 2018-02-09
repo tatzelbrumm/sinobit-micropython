@@ -57,6 +57,8 @@ _This is currently a brain dump of some ideas, goals, to-dos for this project._
 -   Add support for the 12x12 LED matrix to the MicroPython firmware.  Support
     basic pixel drawing operations (clear, fill, set pixel, draw line, draw
     circle, etc.).
+    -   _This is now implemented with the 0.0.1 release! Support for line,
+        circle and other primitive drawing is still to come._
 -   Add support for Chinese text rendering on the matrix.  There is a lot of
     work to investigate here, particularly with text encodings, character sets,
     character representations and rendering.
@@ -66,6 +68,10 @@ _This is currently a brain dump of some ideas, goals, to-dos for this project._
     unused single pixel frame around the edge).  This would make it possible for
     existing micro:bit MicroPython code to 'just work' on the sino:bit and display
     with large pixels.
+    -   _This is now implemented with the 0.0.2 release!  The microbit.display
+        module is implemented with upsampling to the larger sino:bit matrix.
+        Note that individual pixel brightness values are ignored/lost as the
+        sino:bit display doesn't support it._
 -   Investigate untangling and removing hardware access layer dependencies.  It
     appears there are 3 hardware access layers being used: Nordic's nRF layer,
     mBed's classic layer, and a Lancaster University micro:bit device access layer.
