@@ -12,6 +12,11 @@ language created by Damien George that can run on small single board computers
 like the BBC micro:bit. This project is a fork of MicroPython for the BBC
 micro:bit that's intended to run and support the hardware of the sino:bit.
 
+-   **[Code Editor]({{ site.url }}{{ site.baseurl }}/editor/editor.html)** - Write sino:bit MicroPython code directly in your
+    browser and download a firmware to run right on your sino:bit!  This is a
+    port of the BBC micro:bit web editor to be compatible with the sino:bit
+    MicroPythin firmware in this project.  If you want to program your sino:bit
+    with MicroPython start here!
 -   **[Releases](https://github.com/tdicola/sinobit-micropython/releases)** -
     Find the latest releases of sino:bit MicroPython on GitHub.
 -   **[Source](https://github.com/tdicola/sinobit-micropython)** - Find the
