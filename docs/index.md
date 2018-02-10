@@ -97,6 +97,7 @@ _This is currently a brain dump of some ideas, goals, to-dos for this project._
     and changing the hex file it uses to point at the sino:bit version here, along
     with minor tweaks to the UI language, etc.  Ideally this could just be hosted
     straight from this GitHub repository using GitHub's jekyll-based pages rendering.
+    -   __This is done!  See the code editor link at the top of the page.  Some work remains to be done to clean the wording up and make it sino:bit specific.__
 
 ## Differences with the BBC micro:bit
 
