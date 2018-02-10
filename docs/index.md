@@ -24,7 +24,8 @@ micro:bit that's intended to run and support the hardware of the sino:bit.
 
 ## Example Programs
 
-Here are a few examples that will load right in the code editor.  Click download
+Here are a few examples that will load right in the code editor.  Ignore the
+prompt for a password and just press enter, none is set. Click download
 to retrieve a hex file you can drag to the sino:bit's drive and program it!
 
 -   [Hello sino:bit message scroll](https://tdicola.github.io/sinobit-micropython/editor/editor.html?n=U2FsdGVkX19OZgL5SE%2FD4W00fsSqF5lku5amyGYUdMM%3D&c=U2FsdGVkX1%2FW6HbRDRo0VnM8WMiouQkKtrXZNg6PRPotusuRWXNPlT2g346t07JK&s=U2FsdGVkX1%2B%2BWgukDIVDp4%2BcmR8sooljcBRNItbSufr1ze%2BeNwwvl7554qmbu3oCDetd0oK6f0P%2FfGznJEIA2ZC1LkhKcVUeKdo1x68xUWd9UkoMGPiqrXdfkmO%2Fk7vc1VaDLGN5C2oWLKsTu16ITSVeN%2FF776Iv4hpUNs%2Fhb2DwIRN7zAiVzVyx13H%2BmhnXMLZSWi14OvXrwq8JKeqDk%2F%2FUx%2BoYoV%2FWg59ZRbqQUmM%3D&h=)
