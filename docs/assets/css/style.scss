@@ -1,0 +1,13 @@
+---
+---
+// Color overrides for sino:bit site.  These change the cayman theme to a
+// red and yellow style to match the sino:bit.  See the cayman source for the
+// available variables to modify:
+//   https://github.com/pages-themes/cayman/blob/master/_sass/variables.scss
+$header-heading-color: #f0f000;
+$header-bg-color: #ff0000;
+$header-bg-color-secondary: #770000;
+
+$section-headings-color: #990000;
+
+@import "{{ site.theme }}";
