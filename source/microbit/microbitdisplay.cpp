@@ -48,9 +48,10 @@ extern "C" {
 // ignored since the sinobit display can't set individual pixel brightness.
 static void mock_image_buffer_set_pixel(uint8_t x, uint8_t y, uint8_t c) {
     // Calculate location within the 12x12 of the sinobit display.
-    // Note that we need to invert the x axis.
-    uint8_t sinobit_x = 10-(1+2*x);
-    uint8_t sinobit_y = 1+2*y;
+    // Note that we need to swap the axes to orient the display correctly
+    // (although A and B buttons are swapped physically on the board).
+    uint8_t sinobit_y = 1+2*x;
+    uint8_t sinobit_x = 1+2*y;
     // Turn any non-zero brightness to an on pixel.
     bool sinobit_c = c > 0 ? true : false;
     // Set the four pixels of this 2x2 chunk.
@@ -65,8 +66,10 @@ static void mock_image_buffer_set_pixel(uint8_t x, uint8_t y, uint8_t c) {
 
 static uint8_t mock_image_buffer_get_pixel(uint8_t x, uint8_t y) {
     // Calculate location within the 12x12 of the sinobit display.
-    uint8_t sinobit_x = 10-(1+2*x);
-    uint8_t sinobit_y = 1+2*y;
+    // Note that we need to swap the axes to orient the display correctly
+    // (although A and B buttons are swapped physically on the board).
+    uint8_t sinobit_y = 1+2*x;
+    uint8_t sinobit_x = 1+2*y;
     // Check if all 4 pixels of this 2x2 are set.  This isn't perfect since
     // the user might use the sinobit module to manipulate individual pixels.
     // Perhaps consider keeping track of display buffer state separately.
