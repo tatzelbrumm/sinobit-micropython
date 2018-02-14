@@ -86,7 +86,8 @@ _This is currently a brain dump of some ideas, goals, to-dos for this project._
     -   Right now have about ~10kb free in firmware (with no loss of modules
         or features yet).  If can get up to ~100kb free could fit ~6k characters.
     -   Good reference material too: https://r12a.github.io/scripts/chinese/
-        And the GB2312 standard: https://en.wikipedia.org/wiki/GB_2312
+        And the GB2312 standard: https://en.wikipedia.org/wiki/GB_2312  Also DB
+        of characters here: http://hanzidb.org/character-list/general-standard
 -   Backwards compatibility with the micro:bit 5x5 LED display.  In theory it's
     possible to upsample drawing commands intended for the micro:bit's 5x5
     display to instead target 2x2 pixel chunks on the 12x12 display (with an
