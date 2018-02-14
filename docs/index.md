@@ -78,6 +78,15 @@ _This is currently a brain dump of some ideas, goals, to-dos for this project._
 -   Add support for Chinese text rendering on the matrix.  There is a lot of
     work to investigate here, particularly with text encodings, character sets,
     character representations and rendering.
+    -   Consider using this 12x12 font as a base: https://github.com/SolidZORO/zpix-pixel-font
+    -   Good suggestion to scan source script (like in web editor) and extract
+        the set of unicode characters in use to inject into the firmware:
+        https://twitter.com/sceptic_int/status/963668006625861635  This
+        could allow a wide range of characters but without dynamic use of them.
+    -   Right now have about ~10kb free in firmware (with no loss of modules
+        or features yet).  If can get up to ~100kb free could fit ~6k characters.
+    -   Good reference material too: https://r12a.github.io/scripts/chinese/
+        And the GB2312 standard: https://en.wikipedia.org/wiki/GB_2312
 -   Backwards compatibility with the micro:bit 5x5 LED display.  In theory it's
     possible to upsample drawing commands intended for the micro:bit's 5x5
     display to instead target 2x2 pixel chunks on the 12x12 display (with an
