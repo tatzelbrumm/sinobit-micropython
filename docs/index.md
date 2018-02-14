@@ -96,6 +96,8 @@ _This is currently a brain dump of some ideas, goals, to-dos for this project._
     dropping down to a basic usage of Nordic or mBed's hardware access layer would
     save flash space.  Support for the board peripherals like accelerometer and
     magnetomer could be added as simple C extensions.
+    -   microbit-dal usage:
+        -   Font data (MicroBitFont.cpp)
 -   Work on renaming from micro:bit to sino:bit internally.  The microbit module
     should ideally be retained for compatibility with existing micro:bit MicroPython
     code.  However much of the project structure, code files, etc. currently still
