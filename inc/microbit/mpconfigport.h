@@ -78,7 +78,30 @@ typedef long mp_off_t;
 void mp_hal_stdout_tx_strn_cooked(const char *str, mp_uint_t len);
 #define MP_PLAT_PRINT_STRN(str, len) mp_hal_stdout_tx_strn_cooked(str, len)
 
-// extra built in names to add to the global namespace
+// Generate list of built-in functions and modules using the cog code generator.
+// This will read the root config.json for the Yotta project and use the
+// sinobit_micropython entries to generate code and macros that control the
+// built-in function and modules.  See cog docs for how this works (it runs the
+// embedded python code to generate C code inserted in this file).
+//
+// First this cog block reads the Yotta config json and parses it so the
+// following section can easily read values from inside it.
+/*[[[cog
+import json
+import cog
+config = json.load(open(config, 'r'))
+]]]*/
+//[[[end]]]
+
+// Next this cog block generates built-in functions from the following config:
+// - sinobit_micropython.builtins: A dict of function QSTR name to func global
+/*[[[cog
+for name, obj in config['sinobit_micropython']['builtins'].items():
+    cog.outl(f'extern const struct _mp_obj_fun_builtin_t {obj};')
+cog.outl('#define MICROPY_PORT_BUILTINS \\')
+for name, obj in config['sinobit_micropython']['builtins'].items():
+    cog.outl(f'    {{ MP_OBJ_NEW_QSTR(MP_QSTR_{name}), (mp_obj_t)&{obj} }}, \\')
+]]]*/
 extern const struct _mp_obj_fun_builtin_t mp_builtin_help_obj;
 extern const struct _mp_obj_fun_builtin_t mp_builtin_input_obj;
 extern const struct _mp_obj_fun_builtin_t mp_builtin_open_obj;
@@ -86,8 +109,21 @@ extern const struct _mp_obj_fun_builtin_t mp_builtin_open_obj;
     { MP_OBJ_NEW_QSTR(MP_QSTR_help), (mp_obj_t)&mp_builtin_help_obj }, \
     { MP_OBJ_NEW_QSTR(MP_QSTR_input), (mp_obj_t)&mp_builtin_input_obj }, \
     { MP_OBJ_NEW_QSTR(MP_QSTR_open), (mp_obj_t)&mp_builtin_open_obj }, \
+//[[[end]]]
 
-// extra builtin modules to add to the list of known ones
+// This cog block generates built-in modules and aliased modules from the
+// following config:
+// - sinobit_micropython.builtin_modules: Dict of QSTR name to module global
+// - sinobit_micropython.builtin_aliases: Dict of QSTR name to aliased global
+/*[[[cog
+for name, obj in config['sinobit_micropython']['builtin_modules'].items():
+    cog.outl(f'extern const struct _mp_obj_module_t {obj};')
+cog.outl('#define MICROPY_PORT_BUILTIN_MODULES \\')
+for name, obj in config['sinobit_micropython']['builtin_modules'].items():
+    cog.outl(f'    {{ MP_OBJ_NEW_QSTR(MP_QSTR_{name}), (mp_obj_t)&{obj} }}, \\')
+for name, obj in config['sinobit_micropython']['builtin_aliases'].items():
+    cog.outl(f'    {{ MP_OBJ_NEW_QSTR(MP_QSTR_{name}), (mp_obj_t)&{obj} }}, \\')
+]]]*/
 extern const struct _mp_obj_module_t microbit_module;
 extern const struct _mp_obj_module_t sinobit_module;
 extern const struct _mp_obj_module_t music_module;
@@ -100,7 +136,6 @@ extern const struct _mp_obj_module_t os_module;
 extern const struct _mp_obj_module_t radio_module;
 extern const struct _mp_obj_module_t audio_module;
 extern const struct _mp_obj_module_t speech_module;
-
 #define MICROPY_PORT_BUILTIN_MODULES \
     { MP_OBJ_NEW_QSTR(MP_QSTR_microbit), (mp_obj_t)&microbit_module }, \
     { MP_OBJ_NEW_QSTR(MP_QSTR_sinobit), (mp_obj_t)&sinobit_module }, \
@@ -114,10 +149,9 @@ extern const struct _mp_obj_module_t speech_module;
     { MP_OBJ_NEW_QSTR(MP_QSTR_radio), (mp_obj_t)&radio_module }, \
     { MP_OBJ_NEW_QSTR(MP_QSTR_audio), (mp_obj_t)&audio_module }, \
     { MP_OBJ_NEW_QSTR(MP_QSTR_speech), (mp_obj_t)&speech_module }, \
-    \
-    /* the following provide aliases for existing modules */ \
     { MP_OBJ_NEW_QSTR(MP_QSTR_collections), (mp_obj_t)&mp_module_collections }, \
     { MP_OBJ_NEW_QSTR(MP_QSTR_struct), (mp_obj_t)&mp_module_ustruct }, \
+//[[[end]]]
 
 #define MP_STATE_PORT MP_STATE_VM
 

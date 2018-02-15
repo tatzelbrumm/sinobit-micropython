@@ -15,5 +15,8 @@
     "inc/lib",
     "inc/microbit"
   ],
-  "bin": "./source"
+  "bin": "./source",
+  "scripts": {
+    "preGenerate": "./pre_generate.sh"
+  }
 }

@@ -33,7 +33,7 @@ sudo add-apt-repository -y ppa:team-gcc-arm-embedded
 sudo add-apt-repository -y ppa:pmiller-opensource/ppa
 sudo apt-get update
 sudo apt-get install cmake ninja-build gcc-arm-none-eabi srecord libssl-dev
-pip3 install yotta
+pip3 install yotta cogapp
 ```
 
 Mac OSX users can install some of the needed pacakges with [Homebrew](https://brew.sh/).
@@ -42,7 +42,7 @@ downloaded and its /bin/ directory in your path. Other depdencies can be install
 Homebrew and Python's pip package manager (_this is rough information that needs to be verified_):
 ```
 brew install cmake ninja srecord python3
-pip3 install yotta
+pip3 install yotta cogapp
 ```
 
 Once all packages are installed, use yotta to build.  You will need an ARM
