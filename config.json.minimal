@@ -1,0 +1,36 @@
+{
+  "microbit" : {
+    "configfile" : "inc/microbit/MicroBitCustomConfig.h"
+  },
+  "sinobit_micropython": {
+    "builtins": {
+      "input": "mp_builtin_input_obj",
+      "open": "mp_builtin_open_obj"
+    },
+    "builtin_modules": {
+      "microbit": "microbit_module",
+      "sinobit": "sinobit_module",
+      "neopixel": "neopixel_module",
+      "random": "random_module",
+      "os": "os_module",
+      "radio": "radio_module",
+      "audio": "audio_module"
+    },
+    "builtin_aliases": {
+      "collections": "mp_module_collections",
+      "struct": "mp_module_ustruct"
+    },
+    "disabled_builtins": {
+      "help": "mp_builtin_help_obj"
+    },
+    "disabled_builtin_modules": {
+      "music": "music_module",
+      "this": "this_module",
+      "antigravity": "antigravity_module",
+      "love": "love_module",
+      "speech": "speech_module"
+    },
+    "disabled_builtin_aliases": {
+    }
+  }
+}

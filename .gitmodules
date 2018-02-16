@@ -1,3 +1,6 @@
 [submodule "docs/editor"]
 	path = docs/editor
 	url = https://github.com/tdicola/sinobit-PythonEditor.git
+[submodule "tools/zpix"]
+	path = tools/zpix
+	url = https://github.com/SolidZORO/zpix-pixel-font.git
