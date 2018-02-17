@@ -7,7 +7,7 @@ import bdf
 
 INPUT_FILE          = './zpix/src/Zpix.bdf'  # Font to load.
 CHARACTER_MAX_SIZE  = (11, 11)               # Max x, y dimensions of characters
-RENDER_CHARACTER    = 9699                   # Encoding of character to render
+RENDER_CHARACTER    = 36                     # Encoding of character to render
                                              # at end as a test.
 
 
@@ -17,21 +17,21 @@ def increment(dict_, key):
     dict_[key] = dict_.get(key, 0) + 1
 
 # Open the input file and parse all the characters.
-bdf.Character.max_size = CHARACTER_MAX_SIZE
+print(f'Loading {INPUT_FILE}...')
 with open(INPUT_FILE, 'r') as infile:
+    # Make sure to set max character dimensions before loading font.
+    bdf.Character.max_size = CHARACTER_MAX_SIZE
     font = bdf.BDFFont(infile)
+print(f'Loaded {len(font.characters)} characters!')
 
-# Print analytics from the characters.
-# Total characters.
-print(f'Loaded {len(font.characters)} chars')
-# Min and max encoding values.
-min_encoding = font.characters[0].encoding
+# Calculate some statistics and analytics of the font characters.
+# This data is useful to inform the amount of bytes and dimension for packing
+# characters into a binary format for inclusion in the firmware.
+min_encoding = font.characters[0].encoding  # Min and max encoding values.
 max_encoding = font.characters[0].encoding
-# Distribution of dwidth x and y values.
-dwidth_x_dist = {}
+dwidth_x_dist = {}     # Distribution of dwidth x and y values.
 dwidth_y_dist = {}
-# Distribution of bbox values.
-bbox_width_dist = {}
+bbox_width_dist = {}   # Distribution of bbox values.
 bbox_height_dist = {}
 bbox_x_dist = {}
 bbox_y_dist = {}
@@ -50,6 +50,7 @@ for c in font.characters:
     if c.bbox_size[0] > CHARACTER_MAX_SIZE[0] or \
        c.bbox_size[1] > CHARACTER_MAX_SIZE[1]:
         oversize_chars.add(c.encoding)
+
 # Print values found through the analysis above.
 print(f'Min encoding: {min_encoding}')
 print(f'Max encoding: {max_encoding}')
@@ -76,6 +77,7 @@ print('Over size characters:')
 for c in sorted(oversize_chars):
     # Print the decimal encoding, unicode hex input, and actual character.
     print(f'{c} - U+{c:04x} - {c:c}')
+
 # Find a character and render it, this is useful for testing bitmap rendering
 # or viewing a specific character (like one which is oversize).
 for c in font.characters:
