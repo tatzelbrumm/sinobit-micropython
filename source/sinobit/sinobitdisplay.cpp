@@ -1,6 +1,4 @@
 /*
- * This file is part of the Micro Python project, http://micropython.org/
- *
  * The MIT License (MIT)
  *
  * Copyright (c) 2018 Tony DiCola
@@ -25,6 +23,7 @@
  */
 extern "C" {
 
+#include "py/mpprint.h"
 #include "py/mphal.h"
 #include "py/obj.h"
 #include "spi_api.h"
@@ -34,6 +33,8 @@ extern "C" {
 #include "microbitobj.h"
 #include "nrf_gpio.h"
 #include "sinobitdisplay.h"
+#include "sinobittext.h"
+#include "zpixfont.h"
 
 // From the schematic the sino:bit display is driven by a Holtek HT1632C chip
 // connected to the nRF51 with these pins:
@@ -282,6 +283,17 @@ STATIC mp_obj_t sinobit_display_brightness(mp_obj_t brightness) {
 }
 MP_DEFINE_CONST_FUN_OBJ_1(sinobitdisplay_brightness_obj, sinobit_display_brightness);
 
+STATIC mp_obj_t sinobit_display_text(mp_obj_t x, mp_obj_t y, mp_obj_t string) {
+    text_draw_string(mp_obj_get_int(x), mp_obj_get_int(y), string);
+    return mp_const_none;
+}
+MP_DEFINE_CONST_FUN_OBJ_3(sinobitdisplay_text_obj, sinobit_display_text);
+
+STATIC mp_obj_t sinobit_display_text_width(mp_obj_t string) {
+    return MP_OBJ_NEW_SMALL_INT(text_width(string));
+}
+MP_DEFINE_CONST_FUN_OBJ_1(sinobitdisplay_text_width_obj, sinobit_display_text_width);
+
 STATIC const mp_map_elem_t sinobitdisplay_module_globals_table[] = {
     { MP_OBJ_NEW_QSTR(MP_QSTR___name__), MP_OBJ_NEW_QSTR(MP_QSTR_display) },
     { MP_OBJ_NEW_QSTR(MP_QSTR_set_pixel), (mp_obj_t)&sinobitdisplay_set_pixel_obj },
@@ -290,6 +302,8 @@ STATIC const mp_map_elem_t sinobitdisplay_module_globals_table[] = {
     { MP_OBJ_NEW_QSTR(MP_QSTR_fill), (mp_obj_t)&sinobitdisplay_fill_obj },
     { MP_OBJ_NEW_QSTR(MP_QSTR_clear), (mp_obj_t)&sinobitdisplay_clear_obj },
     { MP_OBJ_NEW_QSTR(MP_QSTR_brightness), (mp_obj_t)&sinobitdisplay_brightness_obj },
+    { MP_OBJ_NEW_QSTR(MP_QSTR_text), (mp_obj_t)&sinobitdisplay_text_obj },
+    { MP_OBJ_NEW_QSTR(MP_QSTR_text_width), (mp_obj_t)&sinobitdisplay_text_width_obj },
 };
 
 STATIC MP_DEFINE_CONST_DICT(sinobitdisplay_module_globals, sinobitdisplay_module_globals_table);

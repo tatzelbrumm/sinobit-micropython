@@ -3,6 +3,7 @@
 // sinobit-specific qstrs below:
 Q(sinobit)
 Q(brightness)
+Q(text_width)
 
 // microbit inherited qstrs:
 Q(help)

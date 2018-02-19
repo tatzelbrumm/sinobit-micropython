@@ -13,7 +13,8 @@
   "extraIncludes":[
     "inc",
     "inc/lib",
-    "inc/microbit"
+    "inc/microbit",
+    "inc/sinobit"
   ],
   "bin": "./source",
   "scripts": {

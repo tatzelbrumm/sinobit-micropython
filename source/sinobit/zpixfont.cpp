@@ -1,6 +1,4 @@
 /*
- * This file is part of the Micro Python project, http://micropython.org/
- *
  * The MIT License (MIT)
  *
  * Copyright (c) 2018 Tony DiCola
@@ -23,9 +21,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef __MICROPY_INCLUDED_SIMOBIT_MODSINOBIT_H__
-#define __MICROPY_INCLUDED_SIMOBIT_MODSINOBIT_H__
+extern "C" {
 
-extern const mp_obj_module_t sinobitdisplay_module;
+#include <cstddef>
+#include "zpixfont.h"
 
-#endif
+uint8_t zpixfont_char_dwidth(const zpixfont_character_t* character) {
+  // Grab the pixel width of this character from the bottom 4 bits of the
+  // last data byte.
+  return character->data[15] & 0xF;
+}
+
+const zpixfont_character_t* zpixfont_find_character(uint16_t encoding) {
+  // Find the specified character in the font and return a pointer to it,
+  // or null if the character wasn't found.
+  // Simple linear search.
+  // TODO: Make this a binary search since we know the font array is sorted!
+  for (int i=0; i<zpixfont.count; ++i) {
+    if (zpixfont.characters[i].encoding == encoding) {
+      return &zpixfont.characters[i];
+    }
+  }
+  return NULL;
+}
+
+}

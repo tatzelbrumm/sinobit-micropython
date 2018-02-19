@@ -21,22 +21,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+#ifndef __SINOBIT_TEXT_H__
+#define __SINOBIT_TEXT_H__
+
 extern "C" {
 
+#include <cstdint>
+
 #include "py/obj.h"
-#include "modsinobit.h"
 
-STATIC const mp_map_elem_t sinobit_module_globals_table[] = {
-  { MP_OBJ_NEW_QSTR(MP_QSTR___name__), MP_OBJ_NEW_QSTR(MP_QSTR_sinobit) },
-  { MP_OBJ_NEW_QSTR(MP_QSTR_display), (mp_obj_t)&sinobitdisplay_module },
-};
+void text_draw_char(int x0, int y0, uint16_t encoding);
 
-STATIC MP_DEFINE_CONST_DICT(sinobit_module_globals, sinobit_module_globals_table);
+void text_draw_string(int x0, int y0, mp_obj_t string);
 
-const mp_obj_module_t sinobit_module = {
-  .base = { &mp_type_module },
-  .name = MP_QSTR_sinobit,
-  .globals = (mp_obj_dict_t*)&sinobit_module_globals,
-};
+uint16_t text_width(mp_obj_t string);
 
 }
+
+#endif
