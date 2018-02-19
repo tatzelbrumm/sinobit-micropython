@@ -24,6 +24,19 @@ to have a lot of trouble (Ubuntu 12.04 LTS has old packages, 16.04 LTS has bugs 
 Vagrant integration).  Windows and the Windows 10 Linux subsystem is a total unknown.
 You have been warned._
 
+**Be sure to clone this repository with the --recursive option to make sure necessary
+submodules are downloaded.  Alternatively you can run git submodule init after cloning:***
+```
+git clone --recursive https://github.com/tdicola/sinobit-micropython.git
+```
+or:
+```
+git clone https://github.com/tdicola/sinobit-micropython.git
+cd sinobit-micropython
+git submodule init
+git submodule update
+```
+
 The source code is a yotta application and needs yotta to build, along
 with an ARM compiler toolchain (eg arm-none-eabi-gcc and friends).
 
