@@ -88,6 +88,10 @@ _This is currently a brain dump of some ideas, goals, to-dos for this project._
     -   Good reference material too: https://r12a.github.io/scripts/chinese/
         And the GB2312 standard: https://en.wikipedia.org/wiki/GB_2312  Also DB
         of characters here: http://hanzidb.org/character-list/general-standard
+    -   Also consider other languages as the zpix font includes Japanese and
+        accented English characters.  There's a Hindi font here too: https://github.com/nishapoyarekar/Sinobit/tree/indic
+    -   __Language support is starting to come together!  See a preview here: 
+        https://twitter.com/tdicola/status/965489097769828352__
 -   Backwards compatibility with the micro:bit 5x5 LED display.  In theory it's
     possible to upsample drawing commands intended for the micro:bit's 5x5
     display to instead target 2x2 pixel chunks on the 12x12 display (with an
