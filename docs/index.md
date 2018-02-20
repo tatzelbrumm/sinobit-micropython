@@ -90,6 +90,7 @@ _This is currently a brain dump of some ideas, goals, to-dos for this project._
         of characters here: http://hanzidb.org/character-list/general-standard
     -   Also consider other languages as the zpix font includes Japanese and
         accented English characters.  There's a Hindi font here too: https://github.com/nishapoyarekar/Sinobit/tree/indic
+    -   Entire unicode font in 16x16 and 8x16 size: http://unifoundry.com/unifont.html
     -   __Language support is starting to come together!  See a preview here: 
         https://twitter.com/tdicola/status/965489097769828352__
 -   Backwards compatibility with the micro:bit 5x5 LED display.  In theory it's
