@@ -35,13 +35,26 @@ uint8_t zpixfont_char_dwidth(const zpixfont_character_t* character) {
 const zpixfont_character_t* zpixfont_find_character(uint16_t encoding) {
   // Find the specified character in the font and return a pointer to it,
   // or null if the character wasn't found.
-  // Simple linear search.
-  // TODO: Make this a binary search since we know the font array is sorted!
-  for (int i=0; i<zpixfont.count; ++i) {
-    if (zpixfont.characters[i].encoding == encoding) {
-      return &zpixfont.characters[i];
+  // Binary search for the desired encoding as we know the list of characters
+  // is sorted in ascending encoding order (part of the cog generation script).
+  uint16_t head = 0;
+  uint16_t tail = zpixfont.count-1;
+  while (head <= tail) {
+    uint16_t mid = head + ((tail - head) / 2);
+    if (zpixfont.characters[mid].encoding == encoding) {
+      // Found the character at the midpoint!
+      return &zpixfont.characters[mid];
+    }
+    else if (zpixfont.characters[mid].encoding > encoding) {
+      // Search to the right, midpoint is smaller than target encoding.
+      tail = mid-1;
+    }
+    else {
+      // Else search to the right, midpoint is larger than target encoding.
+      head = mid+1;
     }
   }
+  // Couldn't find the character.
   return NULL;
 }
 
