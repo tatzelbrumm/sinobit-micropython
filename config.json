@@ -31,6 +31,14 @@
     "disabled_builtin_modules": {
     },
     "disabled_builtin_aliases": {
-    }
+    },
+    "zpixfont_bdf": "./tools/zpix/src/Zpix.bdf",
+    "zpixfont_encodings": [
+      [32, 126],
+      [160, 255],
+      [38050, 38050],
+      [38081, 38081],
+      [20384, 20384]
+    ]
   }
 }

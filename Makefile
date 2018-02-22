@@ -9,10 +9,14 @@ HEX_FINAL = build/firmware.hex
 
 all: yotta
 
-yotta: inc/genhdr/qstrdefs.generated.h
+yotta: inc/genhdr/qstrdefs.generated.h inc/sinobit/zpixfont.h
 	@yt build
 	@/bin/cp $(HEX_SRC) $(HEX_FINAL)
 	@arm-none-eabi-size $(OUT_SRC)
+
+inc/sinobit/zpixfont.h: config.json
+	$(ECHO) "Generating zpixfont with cog..."
+	@cog.py -r -D config="./config.json" -I ./tools/ ./inc/sinobit/zpixfont.h
 
 # Note: we need to protect the qstr names from the preprocessor, so we wrap
 # the lines in "" and then unwrap after the preprocessor is finished.

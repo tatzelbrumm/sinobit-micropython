@@ -5,6 +5,3 @@
 
 # Invoke cog to generate code in the mpconfigport.h header.
 cog.py -r -D config="$YOTTA_MERGED_CONFIG_FILE" ./inc/microbit/mpconfigport.h
-
-# Invoke cog to generate font data embedded in build.
-cog.py -r -I ./tools/ ./inc/sinobit/zpixfont.h
