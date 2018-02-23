@@ -26,7 +26,7 @@ else
 	include drivers/bluetooth/bluetooth_common.mk
 endif
 
-ifeq ($(shell test -e boards/$(BOARD)/modules/boardmodules.mk && echo -n yes),yes)
+ifeq ($(shell test -e boards/$(BOARD)/modules/boardmodules.mk && echo yes),yes)
 	include boards/$(BOARD)/modules/boardmodules.mk
 endif
 
@@ -72,13 +72,15 @@ CFLAGS_MCU_m4 = $(CFLAGS_CORTEX_M) -mtune=cortex-m4 -mcpu=cortex-m4 -mfpu=fpv4-s
 CFLAGS_MCU_m0 = $(CFLAGS_CORTEX_M) --short-enums -mtune=cortex-m0 -mcpu=cortex-m0 -mfloat-abi=soft -fno-builtin
 
 
-CFLAGS += $(CFLAGS_MCU_$(MCU_SERIES)) 
+CFLAGS += $(CFLAGS_MCU_$(MCU_SERIES))
 CFLAGS += $(INC) -Wall -Werror -ansi -std=gnu99 -nostdlib $(COPT) $(NRF_DEFINES) $(CFLAGS_MOD)
 CFLAGS += -fno-strict-aliasing
 CFLAGS += -fstack-usage
 CFLAGS += -Iboards/$(BOARD)
 CFLAGS += -DNRF5_HAL_H='<$(MCU_VARIANT)_hal.h>'
-CFLAGS += -flto
+# Disable LTO because it's broken in GCC with some of the structures used for
+# the ports like microbit.  See: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=81440
+#CFLAGS += -flto
 
 LDFLAGS = $(CFLAGS)
 LDFLAGS += -Xlinker -Map=$(@:.elf=.map)
@@ -316,4 +318,3 @@ CFLAGS += -DMICROPY_MODULE_FROZEN_MPY
 endif
 
 include ../../py/mkrules.mk
-
