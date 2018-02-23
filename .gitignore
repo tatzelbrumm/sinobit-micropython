@@ -44,4 +44,5 @@ user.props
 genrst/
 
 .DS_Store
+*.gch
 
