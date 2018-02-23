@@ -78,9 +78,7 @@ CFLAGS += -fno-strict-aliasing
 CFLAGS += -fstack-usage
 CFLAGS += -Iboards/$(BOARD)
 CFLAGS += -DNRF5_HAL_H='<$(MCU_VARIANT)_hal.h>'
-# Disable LTO because it's broken in GCC with some of the structures used for
-# the ports like microbit.  See: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=81440
-#CFLAGS += -flto
+CFLAGS += -flto
 
 LDFLAGS = $(CFLAGS)
 LDFLAGS += -Xlinker -Map=$(@:.elf=.map)
