@@ -26,8 +26,6 @@
 
 #define PCA10028
 
-#define MICROPY_VFS                 (1)
-
 #define MICROPY_HW_BOARD_NAME       "sino:bit"
 #define MICROPY_HW_MCU_NAME         "NRF51822"
 #define MICROPY_PY_SYS_PLATFORM     "nrf51"
