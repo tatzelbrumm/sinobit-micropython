@@ -33,6 +33,7 @@
 #include "softpwm.h"
 #include "ticker.h"
 #include "hal_temp.h"
+#include "sinobitdisplay.h"
 
 extern uint32_t ticks;
 
@@ -108,6 +109,7 @@ MP_DEFINE_CONST_FUN_OBJ_0(microbit_temperature_obj, microbit_temperature);
 
 void board_modules_init0(void) {
     ticker_register_low_pri_callback(microbit_display_tick);
+    sinobitdisplay_init0();
 }
 
 STATIC const mp_rom_map_elem_t microbit_module_globals_table[] = {

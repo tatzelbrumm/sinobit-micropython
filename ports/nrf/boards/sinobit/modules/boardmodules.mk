@@ -9,6 +9,8 @@ SRC_BOARD_MODULES = $(addprefix $(BOARD_SINOBIT_DIR)/,\
                       iters.c \
                       microbitconstimage.c \
                       microbitconstimagetuples.c \
+                      sinobitdisplay.c \
+                      modsinobit.c \
                       modmicrobit.c \
                       )
 
