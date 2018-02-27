@@ -205,6 +205,13 @@ void sinobitdisplay_init0() {
   hal_spi_master_init(SPI_BASE(HTK1632_SPI), &spi_init);
   // Setup pin 16 CS as output that's high by default.
   hal_gpio_pin_high(&pin_A16);
+  // Initialize the display.
+  ht1632_command(HT1632_SYS_EN);             // Turn on oscillator
+  ht1632_command(HT1632_LED_ON);             // Turn on LED duty cyle gen
+  ht1632_command(HT1632_BLINK_OFF);          // Turn off blink
+  ht1632_command(HT1632_RC_MASTER);          // RC master mode
+  ht1632_command(HT1632_COMMON_16NMOS);      // 24 x 16 NMOS open drain
+  ht1632_command(HT1632_PWM_CONTROL | 0xF);  // Full PWM duty cycle
 }
 
 // These are the functions exposed by the module to Python code.  See the
